@@ -29,6 +29,8 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.content.pm.PackageManager;
 import android.view.Surface;
+import android.widget.Button;
+
 
 
 import java.util.ArrayList;
@@ -51,7 +53,7 @@ implements SurfaceHolder.Callback {
 
     // Config ----------------------------------------------------------
 
-    private static int autoFocusInterval = 2000; // Interval between AFcallback and next AF attempt.
+    private static int autoFocusInterval = 1000; // Interval between AFcallback and next AF attempt.
 
     // Public Constants ------------------------------------------------
 
@@ -136,7 +138,7 @@ implements SurfaceHolder.Callback {
             try { params = new JSONObject(paramStr); }
             catch (JSONException e) { params = new JSONObject(); }
             String textTitle = params.optString("text_title");
-            String textInstructions = params.optString("text_instructions");
+            String enterManuallyBtnText = params.optString("enter_manually_label");
             Boolean drawSight = params.optBoolean("drawSight", true);
             whichCamera = params.optString("camera");
             flashMode = params.optString("flash");
@@ -157,9 +159,11 @@ implements SurfaceHolder.Callback {
 
             // Update view with customisable strings
             TextView view_textTitle = (TextView) findViewById(getResourceId("id/csZbarScannerTitle"));
-            TextView view_textInstructions = (TextView) findViewById(getResourceId("id/csZbarScannerInstructions"));
             view_textTitle.setText(textTitle);
-            view_textInstructions.setText(textInstructions);
+
+            Button enterManuallyBtn = (Button)findViewById(getResourceId("id/enter_manually"));
+            enterManuallyBtn.setText(enterManuallyBtnText);
+
 
             // Draw/hide the sight
             if(!drawSight) {
@@ -186,8 +190,8 @@ implements SurfaceHolder.Callback {
             FrameLayout scannerView = (FrameLayout) findViewById(getResourceId("id/csZbarScannerView"));
             scannerView.addView(scannerSurface);
 
+            findViewById(getResourceId("id/enter_manually")).bringToFront();
             findViewById(getResourceId("id/csZbarScannerTitle")).bringToFront();
-            findViewById(getResourceId("id/csZbarScannerInstructions")).bringToFront();
             findViewById(getResourceId("id/csZbarScannerSightContainer")).bringToFront();
             findViewById(getResourceId("id/csZbarScannerSight")).bringToFront();
             scannerView.requestLayout();
@@ -331,6 +335,11 @@ implements SurfaceHolder.Callback {
         tryStopPreview();
         tryStartPreview();
 
+    }
+
+    public void enterManually(View view) {
+        setResult(RESULT_CANCELED);
+        finish();
     }
 
     public void toggleFlash(View view) {
